@@ -653,12 +653,14 @@ func (s *Server) RegisterAndWait(wait bool) {
 }
 
 func (s *Server) resetTopo() {
-	log.Error("resetTopo")
-	if s.top != nil {
-		s.top.Close(s.conf.proxyId)
+	for {
+		e := <-s.evtbus
+		log.Warningf("%+v", e)
+		if s.top.IsConnectEvent(e) {
+			break
+		}
 	}
 
-	s.top = topo.NewTopo(s.conf.productName, s.conf.zkAddr, s.conf.f, s.conf.provider)
 	s.RegisterAndWait(false)
 	_, err := s.top.WatchChildren(models.GetWatchActionPath(s.conf.productName), s.evtbus)
 	if err != nil {

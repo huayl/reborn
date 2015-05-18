@@ -146,6 +146,19 @@ func (top *Topology) DoResponse(seq int, pi *models.ProxyInfo) error {
 	return err
 }
 
+func (top *Topology) IsConnectEvent(event interface{}) bool {
+	e, ok := event.(topo.Event)
+	if !ok {
+		return false
+	}
+
+	if e.State == topo.StateSyncConnected || e.State == topo.StateConnected {
+		return true
+	}
+
+	return false
+}
+
 func (top *Topology) IsSessionExpiredEvent(event interface{}) bool {
 	e, ok := event.(topo.Event)
 	if !ok {
